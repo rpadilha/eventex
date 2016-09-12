@@ -1,7 +1,9 @@
 # EVENTEX
 
 Sistema de eventos encomendado pela Morena
+
 [![Build Status](https://travis-ci.org/rpadilha/eventex.svg?branch=master)](https://travis-ci.org/rpadilha/eventex)
+[![Code Health](https://landscape.io/github/rpadilha/eventex/master/landscape.svg?style=flat)](https://landscape.io/github/rpadilha/eventex/master)
 
 ## Como desenvolver?
 
