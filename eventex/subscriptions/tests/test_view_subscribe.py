@@ -2,7 +2,7 @@ from django.core import mail
 from django.test import TestCase
 from eventex.subscriptions.forms import SubscriptionForm
 
-class SubscribeTest(TestCase):
+class SubscribeGet(TestCase):
     def setUp(self):
         self.response = self.client.get('/inscricao/')
 
@@ -18,11 +18,15 @@ class SubscribeTest(TestCase):
 
     def test_html(self):
         """"HTML must contain input tags"""
-        self.assertContains(self.response, '<form')
-        self.assertContains(self.response, '<input', 6)
-        self.assertContains(self.response, 'type="text"', 3)
-        self.assertContains(self.response, 'type="email"')
-        self.assertContains(self.response, 'type="submit"')
+        tags = (('<form', 1),
+                ('<input', 6),
+                ('type="text"', 3),
+                ('type="email"', 1),
+                ('type="submit"', 1))
+
+        for text, count in tags:
+            with self.subTest():
+                self.assertContains(self.response, text, count)
 
     def test_csrf(self):
         """"HTML must contain csrf"""
@@ -33,13 +37,8 @@ class SubscribeTest(TestCase):
         form = self.response.context['form']
         self.assertIsInstance(form, SubscriptionForm)
 
-    def test_form_has_fields(self):
-        """"Form must have 4 fields """
-        form = self.response.context['form']
-        self.assertSequenceEqual(['name', 'cpf', 'email', 'phone'], list(form.fields))
 
-
-class SubscribePostTest(TestCase):
+class SubscribePostValid(TestCase):
     def setUp(self):
         data = dict(name='Renato Padilha', cpf='012345678901',
                     email='tonare@gmail.com', phone='21-98801-0276')
@@ -53,34 +52,8 @@ class SubscribePostTest(TestCase):
         """1 email should be sent"""
         self.assertEqual(1, len(mail.outbox))
 
-    def test_subscription_mail_subject(self):
-        """E-mail should have an specific subject"""
-        email = mail.outbox[0]
-        expect = 'Confirmação de Inscrição'
-        self.assertEqual(expect, email.subject)
 
-    def test_subscription_mail_from(self):
-        """E-mail should have an specific sender"""
-        email = mail.outbox[0]
-        expect = 'contato@eventex.com.br'
-        self.assertEqual(expect, email.from_email)
-
-    def test_subscription_mail_to (self):
-        """E-mail should have 2 destinations"""
-        email = mail.outbox[0]
-        expect = ['contato@eventex.com.br', 'tonare@gmail.com']
-        self.assertEqual(expect, email.to)
-
-    def test_subscription_mail_body(self):
-        """E-mail body should have subscriptor info"""
-        email = mail.outbox[0]
-        self.assertIn('Renato Padilha', email.body)
-        self.assertIn('12345678901', email.body)
-        self.assertIn('tonare@gmail.com', email.body)
-        self.assertIn('21-98801-0276', email.body)
-
-
-class SubscriberInvalidPost(TestCase):
+class SubscriberPostInvalid(TestCase):
     def setUp(self):
         self.response = self.client.post('/inscricao/', {})
 
