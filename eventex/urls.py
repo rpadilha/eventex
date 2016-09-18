@@ -19,10 +19,11 @@ from django.contrib import admin
 # A view abaixo visa resolver uma exceção que ocorre para o Django 1.10, que por medidas de desempenho,
 # o suporte a referenciar a função view via string foi removido da função url
 from eventex.core import views as eventex_views
-from eventex.subscriptions.views import subscribe
+from eventex.subscriptions.views import subscribe, detail
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^$', eventex_views.home),
     url(r'^inscricao/$', subscribe),
+    url(r'inscricao/(\d+)/$', detail),
 ]
